@@ -25,8 +25,8 @@ static-timing engine.
   netlist + .lib + constraints ──[ vyges-vt-swap ]──►  resized netlist  (+ before/after timing & leakage)
 ```
 
-Every candidate is scored by the [`vyges-sta-si`](https://github.com/vyges-tools/sta-si) timer on
-an ordinary **CPU — no GPU, no CUDA**. It picks **cells, not locations**: same footprint, so
+Every candidate is scored by the [`vyges-sta-si`](https://github.com/vyges-tools/sta-si) timer — it's
+**pure Rust**, so you can experiment with GPUs too via [rust-gpu](https://rust-gpu.github.io/). It picks **cells, not locations**: same footprint, so
 placement/routing are untouched — run it as a post-place ECO and hand the netlist back to the flow.
 
 ## The job
