@@ -1,0 +1,11 @@
+# A runnable vt-swap job: two inverters with a fast/leaky and slow/low-leak flavor.
+# Recover leakage on a met clock.  Run:  vyges-vt-swap run examples/inv.vtswap
+design:      top
+netlist:     inv.v
+lib:         inv.lib
+clock:       clk 1.0
+input_slew:  0.02
+output_load: 0.005
+group:       INV INV_HVT      # fastest (low-Vt) -> slowest (high-Vt)
+objective:   leakage
+effort:      medium

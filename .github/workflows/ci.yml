@@ -1,0 +1,28 @@
+# CI — manual until launch. vyges-vt-swap depends on sibling checkouts of the open
+# vyges-tools/{sta-si, loom} repos (path deps `../vyges-tools-sta-si` / `../vyges-tools-loom`),
+# so we lay them out as siblings before building.
+name: ci
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: vyges-tools-vt-swap
+      - uses: actions/checkout@v4
+        with:
+          repository: vyges-tools/sta-si
+          path: vyges-tools-sta-si
+      - uses: actions/checkout@v4
+        with:
+          repository: vyges-tools/loom
+          path: vyges-tools-loom
+      - name: build + test + clippy
+        working-directory: vyges-tools-vt-swap
+        run: |
+          cargo build --locked
+          cargo test --locked
+          cargo clippy --all-targets -- -D warnings

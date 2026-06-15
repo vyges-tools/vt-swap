@@ -1,0 +1,23 @@
+library (d) {
+  leakage_power_unit : 1nW;
+  cell (INV) {
+    cell_leakage_power : 4.0;
+    pin (A) { direction : input; capacitance : 0.0015; }
+    pin (Y) { direction : output;
+      timing () { related_pin : "A";
+        cell_rise (t)       { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.05, 0.12", "0.07, 0.16" ); }
+        cell_fall (t)       { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.045, 0.11", "0.065, 0.15" ); }
+        rise_transition (t) { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.02, 0.05", "0.025, 0.06" ); }
+        fall_transition (t) { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.02, 0.045", "0.025, 0.055" ); } } }
+  }
+  cell (INV_HVT) {
+    cell_leakage_power : 1.0;
+    pin (A) { direction : input; capacitance : 0.0015; }
+    pin (Y) { direction : output;
+      timing () { related_pin : "A";
+        cell_rise (t)       { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.10, 0.24", "0.14, 0.32" ); }
+        cell_fall (t)       { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.09, 0.22", "0.13, 0.30" ); }
+        rise_transition (t) { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.04, 0.10", "0.05, 0.12" ); }
+        fall_transition (t) { index_1 ("0.01, 0.08"); index_2 ("0.001, 0.01"); values ( "0.04, 0.09", "0.05, 0.11" ); } } }
+  }
+}
