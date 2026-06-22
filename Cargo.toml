@@ -1,6 +1,6 @@
 [package]
 name = "vyges-vt-swap"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "STA-driven Vt swapping: trade threshold-voltage flavors (iso-footprint) to cut leakage while holding timing, or to close setup. Netlist in / netlist out."
 license = "Apache-2.0"
@@ -11,7 +11,7 @@ repository = "https://github.com/vyges-tools/vt-swap"
 # One dependency: the timing engine. vyges-sta-si re-exports the shared vyges-loom
 # readers + design model (incl. per-cell leakage), so vt-swap needs no other deps.
 [dependencies]
-vyges-sta-si = { path = "../vyges-tools-sta-si" }
+vyges-sta-si = { git = "https://github.com/vyges-tools/sta-si", tag = "v0.1.0" }
 
 [[bin]]
 name = "vyges-vt-swap"
