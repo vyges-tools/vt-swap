@@ -11,7 +11,7 @@ repository = "https://github.com/vyges-tools/vt-swap"
 # One dependency: the timing engine. vyges-sta-si re-exports the shared vyges-loom
 # readers + design model (incl. per-cell leakage), so vt-swap needs no other deps.
 [dependencies]
-vyges-sta-si = { git = "https://github.com/vyges-tools/sta-si", tag = "v0.1.0" }
+vyges-sta-si = { git = "https://github.com/vyges-tools/sta-si", branch = "main" }
 
 [[bin]]
 name = "vyges-vt-swap"

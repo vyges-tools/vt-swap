@@ -5,17 +5,19 @@ version = 4
 [[package]]
 name = "vyges-loom"
 version = "0.0.1"
+source = "git+https://github.com/vyges-tools/loom?branch=main#7f4aac6ffbeb6d01bcac7cf4e99d4f0afa28c844"
 
 [[package]]
 name = "vyges-sta-si"
-version = "0.0.1"
+version = "0.1.0"
+source = "git+https://github.com/vyges-tools/sta-si?branch=main#560386446b07bbba8e613b2abec485df97c5c5f8"
 dependencies = [
  "vyges-loom",
 ]
 
 [[package]]
 name = "vyges-vt-swap"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "vyges-sta-si",
 ]
