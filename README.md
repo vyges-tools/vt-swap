@@ -68,6 +68,19 @@ vyges-vt-swap demo                                 # swap a built-in example (no
 
 See [`examples/inv.vtswap`](examples/inv.vtswap) for a runnable example.
 
+## Domain coverage
+
+`vyges-vt-swap` operates on the **standard-cell digital abstraction** — it swaps **standard-cell
+Vt flavors** (the iso-footprint low-/high-Vt families you declare) to trade leakage against
+setup, each candidate scored by the digital `vyges-sta-si` timer. That makes it a **digital
+optimization** engine: it applies wherever a design is built from characterized standard cells
+with multi-Vt variants in the Liberty. It does **not** apply to analog / mixed-signal blocks —
+they have no standard-cell Vt flavors and no Liberty-arc analogue for the timer to score. For
+analog / mixed-signal physical and integrity coverage, reach for the analog-capable Vyges
+engines — [`lvs`](https://github.com/vyges-tools/lvs), [`layout`](https://github.com/vyges-tools/layout),
+[`em-ir`](https://github.com/vyges-tools/em-ir), [`thermal`](https://github.com/vyges-tools/thermal),
+and [`extract`](https://github.com/vyges-tools/extract).
+
 ## Status & bounds
 
 v0 swaps a netlist → netlist over the Vt families you declare; `leakage` recovers leakage while
