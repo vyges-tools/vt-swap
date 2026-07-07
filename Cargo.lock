@@ -17,7 +17,7 @@ dependencies = [
 
 [[package]]
 name = "vyges-vt-swap"
-version = "0.1.8"
+version = "0.1.10"
 dependencies = [
  "vyges-sta-si",
 ]
