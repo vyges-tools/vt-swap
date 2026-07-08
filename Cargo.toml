@@ -1,6 +1,6 @@
 [package]
 name = "vyges-vt-swap"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2021"
 description = "STA-driven Vt swapping: trade threshold-voltage flavors (iso-footprint) to cut leakage while holding timing, or to close setup. Netlist in / netlist out."
 license = "Apache-2.0"
