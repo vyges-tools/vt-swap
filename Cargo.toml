@@ -12,6 +12,7 @@ repository = "https://github.com/vyges-tools/vt-swap"
 # readers + design model (incl. per-cell leakage), so vt-swap needs no other deps.
 [dependencies]
 vyges-sta-si = { git = "https://github.com/vyges-tools/sta-si", branch = "main" }
+vyges-events = { git = "https://github.com/vyges-tools/events", branch = "main", default-features = false }
 
 [[bin]]
 name = "vyges-vt-swap"

@@ -190,7 +190,47 @@ fn write_netlist(text: &str, out: &Option<String>, quiet: bool) {
     }
 }
 
+// Emit a vyges-events causal trail on stderr (the netlist/report still go to stdout / -o).
+// One summary event always; a per-swap event too when the swap set is small enough to enumerate.
+fn emit_vt_swap_events(r: &VtResult) {
+    use vyges_events::{emit, Event, Severity};
+    if r.changed.len() <= 20 {
+        for (inst, old, new) in &r.changed {
+            emit(
+                &Event::new(
+                    "vyges-vt-swap",
+                    Severity::Info,
+                    format!("swapped {inst}: {old} -> {new}"),
+                )
+                .with_code("VTSWAP-FIX")
+                .with_objects(vec![format!("cell:{inst}")]),
+            );
+        }
+    }
+    let saved_pct = if r.before_leak_w > 0.0 {
+        100.0 * (r.before_leak_w - r.after_leak_w) / r.before_leak_w
+    } else {
+        0.0
+    };
+    emit(
+        &Event::new(
+            "vyges-vt-swap",
+            Severity::Info,
+            format!(
+                "vt-swap complete: {} cell(s) swapped; leakage {:.4} -> {:.4} uW ({saved_pct:.1}% saved); WNS {:.4} -> {:.4} ns",
+                r.changed.len(),
+                uw(r.before_leak_w),
+                uw(r.after_leak_w),
+                r.before_wns,
+                r.after_wns
+            ),
+        )
+        .with_code("VTSWAP-DONE"),
+    );
+}
+
 fn finish(r: VtResult, cli: &Cli) {
+    emit_vt_swap_events(&r);
     if cli.json {
         println!("{}", report_json(&r));
         if cli.out.is_some() {
