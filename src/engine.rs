@@ -34,12 +34,20 @@ pub struct VtResult {
 
 /// cell name → leakage (Watts), from the Liberty `cell_leakage_power`.
 fn leakage_map(lib: &Lib) -> HashMap<String, f64> {
-    lib.cells.iter().map(|(n, c)| (n.clone(), c.leakage_w)).collect()
+    lib.cells
+        .iter()
+        .map(|(n, c)| (n.clone(), c.leakage_w))
+        .collect()
 }
 
 /// Total leakage of the current netlist (cells absent from the map contribute 0).
 fn total_leakage(timer: &Timer, leak: &HashMap<String, f64>) -> f64 {
-    timer.netlist().insts.iter().map(|i| leak.get(&i.cell).copied().unwrap_or(0.0)).sum()
+    timer
+        .netlist()
+        .insts
+        .iter()
+        .map(|i| leak.get(&i.cell).copied().unwrap_or(0.0))
+        .sum()
 }
 
 /// Build a [`Timer`] (+ leakage map) from a job, reading the netlist / Liberty / SPEF it names.
@@ -69,7 +77,12 @@ pub fn run(job: &VtJob) -> Result<VtResult, String> {
 }
 
 /// Run on already-parsed inputs (the `demo` path; ideal interconnect, no SPEF).
-pub fn run_inputs(nl_text: &str, lib_text: &str, sta: &StaJob, cfg: &VtCfg) -> Result<VtResult, String> {
+pub fn run_inputs(
+    nl_text: &str,
+    lib_text: &str,
+    sta: &StaJob,
+    cfg: &VtCfg,
+) -> Result<VtResult, String> {
     let nl = netlist::parse(nl_text).map_err(|e| e.to_string())?;
     let lib = Lib::parse(lib_text).map_err(|e| e.to_string())?;
     let leak = leakage_map(&lib);
@@ -97,7 +110,11 @@ pub fn optimize(
 
     let dont = |inst: &str| cfg.dont_touch.iter().any(|p| glob_match(p, inst));
     let cell_of = |t: &Timer, inst: &str| -> Option<String> {
-        t.netlist().insts.iter().find(|i| i.name == inst).map(|i| i.cell.clone())
+        t.netlist()
+            .insts
+            .iter()
+            .find(|i| i.name == inst)
+            .map(|i| i.cell.clone())
     };
 
     // ---- timing: drop the critical path to faster (lower-Vt) flavors until setup is met ----
@@ -110,11 +127,15 @@ pub fn optimize(
             let mut cands: Vec<(String, String, String)> = Vec::new();
             let mut seen: HashSet<String> = HashSet::new();
             for node in timer.worst_path() {
-                let Some((inst, _)) = node.label.split_once('/') else { continue };
+                let Some((inst, _)) = node.label.split_once('/') else {
+                    continue;
+                };
                 if !seen.insert(inst.to_string()) || dont(inst) {
                     continue;
                 }
-                let Some(cur) = cell_of(&timer, inst) else { continue };
+                let Some(cur) = cell_of(&timer, inst) else {
+                    continue;
+                };
                 if let Some(&(gi, pi)) = pos.get(&cur) {
                     if pi > 0 {
                         // a faster flavor is the *previous* entry (groups are fast → slow).
@@ -153,19 +174,27 @@ pub fn optimize(
     // ---- leakage recovery: push slack cells to the next slower (higher-Vt) flavor while
     // timing stays met (one greedy pass; runs for both objectives) ----
     if timer.wns() >= 0.0 {
-        let insts: Vec<(String, String)> =
-            timer.netlist().insts.iter().map(|i| (i.name.clone(), i.cell.clone())).collect();
+        let insts: Vec<(String, String)> = timer
+            .netlist()
+            .insts
+            .iter()
+            .map(|i| (i.name.clone(), i.cell.clone()))
+            .collect();
         for (inst, cur) in insts {
             if dont(&inst) {
                 continue;
             }
-            let Some(&(gi, pi)) = pos.get(&cur) else { continue };
+            let Some(&(gi, pi)) = pos.get(&cur) else {
+                continue;
+            };
             if pi + 1 >= cfg.groups[gi].len() {
                 continue; // already the slowest / highest-Vt
             }
             let slower = cfg.groups[gi][pi + 1].clone();
             // only worth it if the slower flavor actually leaks less.
-            if leak.get(&slower).copied().unwrap_or(f64::INFINITY) > leak.get(&cur).copied().unwrap_or(0.0) {
+            if leak.get(&slower).copied().unwrap_or(f64::INFINITY)
+                > leak.get(&cur).copied().unwrap_or(0.0)
+            {
                 continue;
             }
             let base_whs = timer.whs();

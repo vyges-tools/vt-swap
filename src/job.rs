@@ -63,7 +63,9 @@ pub fn parse_cfg(text: &str) -> Result<VtCfg, String> {
     let mut dont_touch = Vec::new();
     for raw in text.lines() {
         let line = raw.split('#').next().unwrap_or("").trim();
-        let Some((k, v)) = line.split_once(':') else { continue };
+        let Some((k, v)) = line.split_once(':') else {
+            continue;
+        };
         let (k, v) = (k.trim().to_lowercase(), v.trim());
         match k.as_str() {
             "group" => {
@@ -76,13 +78,18 @@ pub fn parse_cfg(text: &str) -> Result<VtCfg, String> {
                 objective = match v.to_lowercase().as_str() {
                     "leakage" => Objective::Leakage,
                     "timing" => Objective::Timing,
-                    other => return Err(format!("objective must be leakage|timing, got {other:?}")),
+                    other => {
+                        return Err(format!("objective must be leakage|timing, got {other:?}"))
+                    }
                 };
             }
             "effort" => effort_word = v.to_lowercase(),
             "dont_touch" => {
                 dont_touch.extend(
-                    v.split([',', ' ']).map(str::trim).filter(|s| !s.is_empty()).map(str::to_string),
+                    v.split([',', ' '])
+                        .map(str::trim)
+                        .filter(|s| !s.is_empty())
+                        .map(str::to_string),
                 );
             }
             _ => {}
@@ -94,7 +101,12 @@ pub fn parse_cfg(text: &str) -> Result<VtCfg, String> {
         "high" => 500,
         other => return Err(format!("effort must be low|medium|high, got {other:?}")),
     };
-    Ok(VtCfg { groups, objective, effort, dont_touch })
+    Ok(VtCfg {
+        groups,
+        objective,
+        effort,
+        dont_touch,
+    })
 }
 
 /// A tiny glob matcher: supports a single leading and/or trailing `*` (e.g. `clk_*`,

@@ -10,7 +10,12 @@ use vyges_sta_si::netlist::Netlist;
 /// then one instance line per cell (`<cell> <inst> ( .<pin>(<net>), … );`).
 pub fn to_verilog(nl: &Netlist) -> String {
     let mut s = String::new();
-    let ports: Vec<&str> = nl.inputs.iter().chain(&nl.outputs).map(String::as_str).collect();
+    let ports: Vec<&str> = nl
+        .inputs
+        .iter()
+        .chain(&nl.outputs)
+        .map(String::as_str)
+        .collect();
     let _ = writeln!(s, "module {} ( {} );", nl.module, ports.join(", "));
     if !nl.inputs.is_empty() {
         let _ = writeln!(s, "  input {};", nl.inputs.join(", "));
@@ -37,8 +42,11 @@ pub fn to_verilog(nl: &Netlist) -> String {
     }
 
     for inst in &nl.insts {
-        let conns: Vec<String> =
-            inst.conns.iter().map(|(p, n)| format!(".{p}({n})")).collect();
+        let conns: Vec<String> = inst
+            .conns
+            .iter()
+            .map(|(p, n)| format!(".{p}({n})"))
+            .collect();
         let _ = writeln!(s, "  {} {} ( {} );", inst.cell, inst.name, conns.join(", "));
     }
     let _ = writeln!(s, "endmodule");

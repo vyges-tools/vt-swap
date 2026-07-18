@@ -36,7 +36,8 @@ flags:
   --star               star this tool on GitHub ⭐
 ";
 
-const BUG_URL: &str = "https://github.com/vyges/community/issues/new?template=bug_report_template.yaml";
+const BUG_URL: &str =
+    "https://github.com/vyges/community/issues/new?template=bug_report_template.yaml";
 const FEATURE_URL: &str = "https://github.com/vyges/community/issues/new?labels=enhancement";
 const SPONSOR_URL: &str = "https://github.com/sponsors/vyges-ip";
 const STAR_URL: &str = "https://github.com/vyges-tools/vt-swap";
@@ -45,7 +46,11 @@ fn link(label: &str, url: &str) {
     use std::io::IsTerminal;
     println!("{label}:\n  {url}");
     if std::io::stdout().is_terminal() {
-        let opener = if cfg!(target_os = "macos") { "open" } else { "xdg-open" };
+        let opener = if cfg!(target_os = "macos") {
+            "open"
+        } else {
+            "xdg-open"
+        };
         let _ = std::process::Command::new(opener).arg(url).status();
     }
 }
@@ -108,9 +113,18 @@ fn render_report(r: &VtResult) -> String {
     s.push_str("vyges-vt-swap — threshold-voltage swap\n");
     s.push_str(&format!(
         "  mode:    {}\n",
-        if r.eco { "post-place ECO (SPEF interconnect)" } else { "pre-place (ideal interconnect)" }
+        if r.eco {
+            "post-place ECO (SPEF interconnect)"
+        } else {
+            "pre-place (ideal interconnect)"
+        }
     ));
-    s.push_str(&format!("  setup:   WNS {:.4} -> {:.4} ns [{}]\n", r.before_wns, r.after_wns, met(r.after_wns)));
+    s.push_str(&format!(
+        "  setup:   WNS {:.4} -> {:.4} ns [{}]\n",
+        r.before_wns,
+        r.after_wns,
+        met(r.after_wns)
+    ));
     s.push_str(&format!(
         "  leakage: {:.4} -> {:.4} uW  ({saved:.1}% saved)\n",
         uw(r.before_leak_w),
@@ -164,7 +178,8 @@ library (d) {
   }
 }
 "#;
-const DEMO_JOB: &str = "design: demo\nnetlist: x\nlib: x\nclock: clk 1.0\ninput_slew: 0.02\noutput_load: 0.005\n";
+const DEMO_JOB: &str =
+    "design: demo\nnetlist: x\nlib: x\nclock: clk 1.0\ninput_slew: 0.02\noutput_load: 0.005\n";
 
 fn run_demo() -> Result<VtResult, String> {
     let sta = StaJob::parse(DEMO_JOB, "").map_err(|e| e.to_string())?;
@@ -268,6 +283,10 @@ fn main() {
     }
   },
   "artifacts": [ { "role": "netlist", "from_arg": "out" } ],
+  "assertion": {
+    "id": "vt-swapping",
+    "not_applicable": true
+  },
   "consumes": ["netlist", "liberty", "timing_report"]
 }
 "#;
@@ -289,7 +308,11 @@ fn main() {
         return link("Star vyges-vt-swap on GitHub ⭐", STAR_URL);
     }
     if cli.version {
-        println!("vyges-vt-swap {} ({})", vyges_vt_swap::VERSION, env!("VYGES_GIT_SHA"));
+        println!(
+            "vyges-vt-swap {} ({})",
+            vyges_vt_swap::VERSION,
+            env!("VYGES_GIT_SHA")
+        );
         println!("{}", vyges_vt_swap::COPYRIGHT);
         return;
     }
@@ -345,7 +368,12 @@ fn main() {
                 }
             };
             if cli.verbose {
-                eprintln!("vt-swapping {} ({} group(s), effort {})", job.sta.design, job.cfg.groups.len(), job.cfg.effort);
+                eprintln!(
+                    "vt-swapping {} ({} group(s), effort {})",
+                    job.sta.design,
+                    job.cfg.groups.len(),
+                    job.cfg.effort
+                );
             }
             match engine::run(&job) {
                 Ok(r) => finish(r, &cli),
