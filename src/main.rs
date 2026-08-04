@@ -267,6 +267,7 @@ fn main() {
     if args.iter().any(|a| a == "--describe") {
         // Machine-readable description of `run` for tooling that drives it.
         const DESCRIBE: &str = r#"{
+  "schema": "vyges-tool-descriptor/1.1",
   "name": "vt-swap",
   "summary": "STA-driven threshold-voltage swapping (cut leakage / close setup, iso-footprint)",
   "maturity": "structured",
