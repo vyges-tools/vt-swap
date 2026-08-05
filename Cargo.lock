@@ -116,7 +116,7 @@ dependencies = [
 
 [[package]]
 name = "vyges-vt-swap"
-version = "0.1.26"
+version = "0.1.27"
 dependencies = [
  "vyges-events",
  "vyges-sta-si",
