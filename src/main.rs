@@ -14,12 +14,12 @@ use vyges_vt_swap::engine::{self, VtResult};
 use vyges_vt_swap::job::{parse_cfg, Objective, VtJob};
 
 const USAGE: &str = "\
-vyges-vt-swap — STA-driven threshold-voltage swapping (cut leakage / close setup, iso-footprint)
+vyges loom vt-swap — STA-driven threshold-voltage swapping (cut leakage / close setup, iso-footprint)
 
 usage:
-  vyges-vt-swap run   JOB  [-o OUT] [--json] [--fail-on-violation]   swap Vt -> resized netlist
-  vyges-vt-swap check JOB                                            validate the job
-  vyges-vt-swap demo                                                 swap a built-in example (no files)
+  vyges loom vt-swap run   JOB  [-o OUT] [--json] [--fail-on-violation]   swap Vt -> resized netlist
+  vyges loom vt-swap check JOB                                            validate the job
+  vyges loom vt-swap demo                                                 swap a built-in example (no files)
 
 flags:
   -o FILE              write the resized netlist to FILE (default: stdout)
