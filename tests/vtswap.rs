@@ -37,7 +37,13 @@ const NL: &str = "module top ( a, y ); input a; output y; wire n1;\n\
 
 fn sta(period: f64) -> StaJob {
     StaJob::parse(
-        &format!("design: t\nnetlist: x\nlib: x\nclock: clk {period}\ninput_slew: 0.02\noutput_load: 0.005\n"),
+        // ⚠️ `input_delay` must be DECLARED, not defaulted: sta-si 4a578af stopped seeding every
+        // input port implicitly, because inventing a launch at time zero manufactures hold
+        // violations on ports that were never constrained. Presence of the key is the
+        // declaration — zero is a declaration, absence is not — so without this line the input
+        // port starts no timed path, the design has no paths at all, and WNS is +inf. These
+        // fixtures always meant "the input arrives at 0"; now they say so.
+        &format!("design: t\nnetlist: x\nlib: x\nclock: clk {period}\ninput_slew: 0.02\noutput_load: 0.005\ninput_delay: 0\n"),
         "",
     )
     .unwrap()
