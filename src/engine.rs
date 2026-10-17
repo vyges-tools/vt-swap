@@ -10,7 +10,6 @@ use std::collections::{HashMap, HashSet};
 use vyges_sta_si::job::StaJob;
 use vyges_sta_si::liberty::Lib;
 use vyges_sta_si::netlist;
-use vyges_sta_si::spef::Spef;
 use vyges_sta_si::sta::Timer;
 
 use crate::emit;
@@ -52,19 +51,9 @@ fn total_leakage(timer: &Timer, leak: &HashMap<String, f64>) -> f64 {
 
 /// Build a [`Timer`] (+ leakage map) from a job, reading the netlist / Liberty / SPEF it names.
 fn build(sta: &StaJob) -> Result<(Timer, HashMap<String, f64>, bool), String> {
-    let nl = netlist::load(&sta.resolve(&sta.netlist)).map_err(|e| e.to_string())?;
-    let mut lib = Lib::default();
-    for l in &sta.libs {
-        let one = Lib::load(&sta.resolve(l)).map_err(|e| e.to_string())?;
-        lib.cells.extend(one.cells);
-    }
-    if lib.cells.is_empty() {
-        return Err("no cells in any .lib".into());
-    }
-    let spef = match &sta.spef {
-        Some(p) => Some(Spef::load(&sta.resolve(p)).map_err(|e| e.to_string())?),
-        None => None,
-    };
+    // the timer's own reader: libraries merged in the first one's units, SPEF in the netlist's names
+    let (nl, lib, spef) =
+        vyges_sta_si::engine::load_inputs(sta, Default::default()).map_err(|e| e.to_string())?;
     let leak = leakage_map(&lib);
     let timer = Timer::build(&nl, &lib, sta, spef.as_ref()).map_err(|e| e.to_string())?;
     Ok((timer, leak, spef.is_some()))
@@ -88,6 +77,19 @@ pub fn run_inputs(
     let leak = leakage_map(&lib);
     let timer = Timer::build(&nl, &lib, sta, None).map_err(|e| e.to_string())?;
     optimize(timer, cfg, &leak, false)
+}
+
+/// The nearest member of `group` past position `pi` — toward the end when `up`, else toward the
+/// start — that the library does not mark `dont_use`. A library-withheld cell is stepped over,
+/// never chosen (the reference's resizer skips it in every candidate list), though an instance
+/// may already hold one and still move off it.
+fn neighbour(group: &[String], pi: usize, up: bool, lib: &Lib) -> Option<String> {
+    let usable = |c: &&String| !lib.cells.get(c.as_str()).is_some_and(|l| l.dont_use);
+    if up {
+        group.iter().skip(pi + 1).find(usable).cloned()
+    } else {
+        group.iter().take(pi).rev().find(usable).cloned()
+    }
 }
 
 /// The optimizer over a built [`Timer`].
@@ -137,9 +139,9 @@ pub fn optimize(
                     continue;
                 };
                 if let Some(&(gi, pi)) = pos.get(&cur) {
-                    if pi > 0 {
-                        // a faster flavor is the *previous* entry (groups are fast → slow).
-                        cands.push((inst.to_string(), cur, cfg.groups[gi][pi - 1].clone()));
+                    // a faster flavor is an *earlier* entry (groups are fast → slow).
+                    if let Some(faster) = neighbour(&cfg.groups[gi], pi, false, timer.lib()) {
+                        cands.push((inst.to_string(), cur, faster));
                     }
                 }
             }
@@ -187,10 +189,9 @@ pub fn optimize(
             let Some(&(gi, pi)) = pos.get(&cur) else {
                 continue;
             };
-            if pi + 1 >= cfg.groups[gi].len() {
-                continue; // already the slowest / highest-Vt
-            }
-            let slower = cfg.groups[gi][pi + 1].clone();
+            let Some(slower) = neighbour(&cfg.groups[gi], pi, true, timer.lib()) else {
+                continue; // already the slowest / highest-Vt usable
+            };
             // only worth it if the slower flavor actually leaks less.
             if leak.get(&slower).copied().unwrap_or(f64::INFINITY)
                 > leak.get(&cur).copied().unwrap_or(0.0)
