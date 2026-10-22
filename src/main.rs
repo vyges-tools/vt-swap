@@ -176,6 +176,7 @@ const DEMO_NL: &str = "module top ( a, y ); input a; output y; wire n1;\n\
                        INV u1 ( .A(a), .Y(n1) ); INV u2 ( .A(n1), .Y(y) ); endmodule";
 const DEMO_LIB: &str = r#"
 library (d) {
+  lu_table_template (t) { variable_1 : input_net_transition; variable_2 : total_output_net_capacitance; }
   leakage_power_unit : 1nW;
   cell (INV) {
     cell_leakage_power : 4.0;

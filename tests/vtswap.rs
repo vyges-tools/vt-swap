@@ -8,6 +8,7 @@ use vyges_vt_swap::job::{glob_match, parse_cfg};
 // A fast/leaky LVT inverter and a slow/low-leak HVT inverter, same footprint.
 const LIB: &str = r#"
 library (d) {
+  lu_table_template (t) { variable_1 : input_net_transition; variable_2 : total_output_net_capacitance; }
   leakage_power_unit : 1nW;
   cell (INV) {                 // low-Vt: fast, leaky
     cell_leakage_power : 4.0;
