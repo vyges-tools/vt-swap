@@ -1,7 +1,5 @@
 # vyges-vt-swap
 
-**[Download Loom](https://vyges.com/products/vyges-cli/#install)** · install the free [Vyges CLI](https://vyges.com/products/vyges-cli/), then `vyges install loom`
-
 **STA-driven threshold-voltage swapping**: a gate-level netlist in, a **resized netlist** out —
 each cell moved to the Vt flavor that cuts leakage (or closes setup), scored by a real
 static-timing engine.
